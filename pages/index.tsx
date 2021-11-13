@@ -1,11 +1,9 @@
-import type { NextPage } from "next";
+import { NextPage } from "next";
+import React from "react";
+import { HomeContent } from "../components/HomeContent/HomeContent";
 
 const Home: NextPage = () => {
-  return (
-    <div>
-      <h1>next-snap-scroll</h1>
-    </div>
-  );
+  return <HomeContent />;
 };
 
 export default Home;
