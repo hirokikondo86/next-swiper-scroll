@@ -1,1 +1,1 @@
-# snap-scroll
+# next-snap-app
