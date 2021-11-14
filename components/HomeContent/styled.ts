@@ -35,3 +35,7 @@ export const Contents = styled.div`
   width: 100%;
   height: 550px;
 `;
+
+export const Text = styled.p<{ color: string }>`
+  color: ${({ color }) => color};
+`;

@@ -1,4 +1,4 @@
-import { VFC } from "react";
+import { useState, VFC } from "react";
 import { SwiperSlide } from "swiper/react";
 import { CustomSwiper, Item, Radius, SubItem } from "./styled";
 import "swiper/css";
@@ -9,9 +9,9 @@ type Category = {
   color: string;
 };
 
-type Props = { categories: Category[] };
+type Props = { categories: Category[]; onSlideChange: (index: number) => void };
 
-export const CategoryList: VFC<Props> = ({ categories }) => {
+export const CategoryList: VFC<Props> = ({ categories, onSlideChange }) => {
   return (
     <CustomSwiper
       grabCursor={true}
@@ -19,6 +19,8 @@ export const CategoryList: VFC<Props> = ({ categories }) => {
       spaceBetween={20}
       centeredSlides={true}
       loop={true}
+      slideToClickedSlide={true}
+      onSlideChange={(swiper) => onSlideChange(swiper.realIndex)}
     >
       {categories.map((category) => (
         <SwiperSlide key={category.japanese}>
