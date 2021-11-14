@@ -1,16 +1,37 @@
 import styled from "styled-components";
 
-export const Container = styled.div`
-  position: absolute;
+export const Container = styled.div``;
+
+export const Header = styled.header`
+  position: fixed;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 60px;
+  background-color: #ddd;
+`;
+
+export const Main = styled.main`
+  margin-top: 60px;
+`;
+
+export const Footer = styled.footer`
+  position: fixed;
   bottom: 0;
-  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 50px;
+  background-color: #ddd;
 `;
 
-export const FocusedIndex = styled.p`
-  text-align: center;
-`;
-
-export const Background = styled.div`
-  padding: 16px 0;
-  background-color: #333;
+export const Contents = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 550px;
 `;

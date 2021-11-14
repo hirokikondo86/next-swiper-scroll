@@ -1,1 +1,1 @@
-# next-snap-app
+# next-swiper-app
