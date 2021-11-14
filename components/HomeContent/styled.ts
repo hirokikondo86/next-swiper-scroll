@@ -26,6 +26,7 @@ export const Footer = styled.footer`
   width: 100%;
   height: 50px;
   background-color: #ddd;
+  z-index: 100;
 `;
 
 export const Contents = styled.div`
@@ -33,7 +34,7 @@ export const Contents = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 550px;
+  height: 400px;
 `;
 
 export const Text = styled.p<{ color: string }>`
