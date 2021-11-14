@@ -7,12 +7,7 @@ const sampleItemColors = [
   "blue",
   "green",
   "yellow",
-  "orange",
-  "purple",
-  "pink",
-  "brown",
-  "black",
-  "white",
+
 ];
 
 export const sampleItems: {

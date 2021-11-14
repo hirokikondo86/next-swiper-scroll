@@ -5,8 +5,11 @@ export const Container = styled.div`
   overflow: hidden;
 `;
 
-export const Base = styled.div<{ transform: string }>`
-  transform: ${({ transform }) => transform};
+export const Base = styled.div<{ isVertical: boolean; baseTranslate: number }>`
+  transform: ${({ isVertical, baseTranslate }) =>
+    isVertical
+      ? `translate3d(0px, ${baseTranslate}px, 0px)`
+      : `translate3d(${baseTranslate}px, 0px, 0px)`};
 `;
 
 export const Inner = styled.div<{

@@ -11,5 +11,6 @@ export const FocusedIndex = styled.p`
 `;
 
 export const Background = styled.div`
+  padding: 16px 0;
   background-color: #333;
 `;

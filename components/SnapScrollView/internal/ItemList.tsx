@@ -3,10 +3,11 @@ import { Container } from "./styled";
 
 export const ItemList: VFC<{
   items: React.ReactElement[];
-  itemMargin: string;
   groupIndex: number;
+  itemMarginPixel: number;
+  isVertical: boolean;
   snapTo(commonIndex: number): Promise<void>;
-}> = ({ items, itemMargin, groupIndex, snapTo }) => {
+}> = ({ items, groupIndex, itemMarginPixel, isVertical, snapTo }) => {
   return (
     <>
       {items.map((item, index) => {
@@ -15,7 +16,8 @@ export const ItemList: VFC<{
           <Container
             key={commonIndex}
             className="item"
-            margin={itemMargin}
+            itemMarginPixel={itemMarginPixel}
+            isVertical={isVertical}
             onClick={() => snapTo(commonIndex)}
           >
             {item}

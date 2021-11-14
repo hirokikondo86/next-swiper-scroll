@@ -2,7 +2,6 @@ import React, {
   useState,
   useEffect,
   useCallback,
-  useMemo,
   useRef,
   TouchEvent,
 } from "react";
@@ -32,7 +31,7 @@ type Props = {
   onSnap?({ focusedIndex }: { focusedIndex: number }): void;
 };
 
-export const SnapScrollView: React.FC<Props> = ({
+export const SnapScrollView: React.VFC<Props> = ({
   items,
   itemMarginPixel = 16,
   transitionDuration = 300,
@@ -76,6 +75,7 @@ export const SnapScrollView: React.FC<Props> = ({
         }
         hand += rangeWidth;
       }
+      console.log(commonIndex);
       return { currentFocusedItemIndex, commonIndex };
     },
     [
@@ -108,6 +108,7 @@ export const SnapScrollView: React.FC<Props> = ({
         prevItemsWidth += config.itemElementSizes[targetItemIndex];
         prevItemsWidth += itemMarginPixel * 2;
       }
+      // 一つ前アイテムのサイズ（初期表示だと0になる）
       prevItemsWidth +=
         config.itemElementSizes[itemCommonIndex % items.length] / 2;
 
@@ -129,15 +130,24 @@ export const SnapScrollView: React.FC<Props> = ({
   );
 
   useEffect(() => {
+    // 縦か横か取得
     const clientSize = isVertical ? ClientSize.HEIGHT : ClientSize.WIDTH;
 
+    // SnapScrollView要素を取得
     const snapScrollViewElement = snapScrollViewRef.current;
+    // SnapScrollView要素のサイズを取得
     const snapScrollViewElementSize = snapScrollViewElement?.[clientSize] || 0;
+
+    // ItemGroup要素を取得
     const itemGroupElement = itemGroupRef.current;
+    // ItemGroup要素のサイズを取得
     const itemGroupElementSize = itemGroupElement?.[clientSize] || 0;
+
+    // itemList内のclassName=itemの要素を取得
     const itemElements = Array.from(
       itemGroupElement?.getElementsByClassName("item") || []
     );
+    // Itemのサイズを取得
     const itemElementSizes = itemElements.map(
       (itemElement) => itemElement[clientSize] || 0
     );
@@ -149,8 +159,8 @@ export const SnapScrollView: React.FC<Props> = ({
       baseTranslate,
     });
 
-    setState((_state) => ({
-      ..._state,
+    setState((prevState) => ({
+      ...prevState,
       itemGroupElementSize,
       snapScrollViewElementSize,
       itemElementSizes,
@@ -164,12 +174,13 @@ export const SnapScrollView: React.FC<Props> = ({
     const { currentFocusedItemIndex } = getFocusedItemIndex(
       state.lastInnerTranslate
     );
-    setState((_state) => ({ ..._state, currentFocusedItemIndex }));
+    setState((prevState) => ({ ...prevState, currentFocusedItemIndex }));
   }, [getFocusedItemIndex, state.lastInnerTranslate]);
 
   const snapTo = useCallback(
     async (commonIndex: number) => {
       const innerTranslate = getInnerTranslateWhenItemIsInCenter(commonIndex);
+      // 移動がない場合は何もしない
       if (innerTranslate === state.lastInnerTranslate && state.offset === 0) {
         return;
       }
@@ -179,14 +190,14 @@ export const SnapScrollView: React.FC<Props> = ({
         focusedItemCommonIndex / items.length
       );
 
-      setState((_state) => {
+      setState((prevState) => {
         const diff = 1 - focusedItemItemGroupIndex;
         const baseTranslate =
           focusedItemItemGroupIndex === 1
-            ? _state.baseTranslate
-            : _state.baseTranslate - diff * _state.itemGroupElementSize;
+            ? prevState.baseTranslate
+            : prevState.baseTranslate - diff * prevState.itemGroupElementSize;
         return {
-          ..._state,
+          ...prevState,
           lastInnerTranslate: innerTranslate,
           offset: 0,
           isGrabbing: false,
@@ -203,11 +214,14 @@ export const SnapScrollView: React.FC<Props> = ({
     ]
   );
 
+  // タッチスクロールを終了した時
   const handleTouchEnd = useCallback(
     (event: TouchEvent<HTMLDivElement>) => {
       event.persist();
 
+      // タッチスクロールをしている時のみ
       if (state.isGrabbing) {
+        // スクロール終了位置を取得
         const offset =
           state.grabStartPoint -
           event.changedTouches[0][
@@ -240,35 +254,41 @@ export const SnapScrollView: React.FC<Props> = ({
     ]
   );
 
+  // タッチスクロールで動かしている時
   const handleTouchMove = useCallback(
     (event: TouchEvent<HTMLDivElement>) => {
       event.persist();
 
+      // タッチを開始した地点
       let grabStartPoint = state.grabStartPoint;
 
-      // Grab start
+      // タッチを開始
       if (!state.isGrabbing) {
+        // タッチを開始した地点
         grabStartPoint =
           event.changedTouches[0][
             isVertical ? ClientCoordinate.Y : ClientCoordinate.X
           ];
-        setState((_state) => ({
-          ..._state,
+        setState((prevState) => ({
+          ...prevState,
           isGrabbing: true,
           grabStartPoint,
         }));
       }
 
+      // タッチ開始した位置からの現在移動しているところまでの相対位置
       const offset =
         grabStartPoint -
         event.changedTouches[0][
           isVertical ? ClientCoordinate.Y : ClientCoordinate.X
         ];
       const now = new Date().getTime();
-      setState((_state) => {
-        const time = now - _state.lastMovedAt;
-        const scrollVelocity = (_state.offset - offset) / time;
-        return { ..._state, offset, scrollVelocity, lastMovedAt: now };
+      setState((prevState) => {
+        // 前回のスクロール時間からの経過時間
+        const time = now - prevState.lastMovedAt;
+        // スクロール速度を計算
+        const scrollVelocity = (prevState.offset - offset) / time;
+        return { ...prevState, offset, scrollVelocity, lastMovedAt: now };
       });
     },
     [isVertical, state.grabStartPoint, state.isGrabbing]
@@ -279,14 +299,14 @@ export const SnapScrollView: React.FC<Props> = ({
       ref={snapScrollViewRef}
       onTouchEnd={handleTouchEnd}
       onTouchMove={handleTouchMove}
+      //   onMouseDown={handleMouseDown}
+      //   onMouseUp={handleMouseUp}
+      //   onMouseMove={handleMouseMove}
     >
       <Base
         className="base"
-        transform={
-          isVertical
-            ? `translate3d(0px, ${state.baseTranslate}px, 0px)`
-            : `translate3d(${state.baseTranslate}px, 0px, 0px)`
-        }
+        isVertical={isVertical}
+        baseTranslate={state.baseTranslate}
       >
         <Inner
           className="inner"
@@ -306,12 +326,9 @@ export const SnapScrollView: React.FC<Props> = ({
               >
                 <ItemList
                   items={items}
-                  itemMargin={
-                    isVertical
-                      ? `${itemMarginPixel}px 0`
-                      : `0 ${itemMarginPixel}px`
-                  }
                   groupIndex={i}
+                  itemMarginPixel={itemMarginPixel}
+                  isVertical={isVertical}
                   snapTo={snapTo}
                 />
               </ItemGroup>
@@ -319,12 +336,9 @@ export const SnapScrollView: React.FC<Props> = ({
               <ItemGroup key={i} className="item-group" isVertical={isVertical}>
                 <ItemList
                   items={items}
-                  itemMargin={
-                    isVertical
-                      ? `${itemMarginPixel}px 0`
-                      : `0 ${itemMarginPixel}px`
-                  }
                   groupIndex={i}
+                  itemMarginPixel={itemMarginPixel}
+                  isVertical={isVertical}
                   snapTo={snapTo}
                 />
               </ItemGroup>
